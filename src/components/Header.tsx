@@ -1,8 +1,22 @@
-import { Link } from "react-router-dom";
-import { ShoppingCart, User, Sparkles } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ShoppingCart, User, Sparkles, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been signed out successfully.",
+    });
+    navigate("/");
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -31,11 +45,22 @@ const Header = () => {
               <ShoppingCart className="h-5 w-5" />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/profile">
-              <User className="h-5 w-5" />
-            </Link>
-          </Button>
+          {user ? (
+            <>
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/profile">
+                  <User className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </>
+          ) : (
+            <Button variant="default" asChild>
+              <Link to="/auth">Sign In</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
